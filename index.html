@@ -125,9 +125,16 @@ th{background:#eaf0f6}.deleteBtn{color:#d00;font-weight:bold;cursor:pointer}
 const $ = id => document.getElementById(id);
 const RECORD_KEY = "inventoryScan_records_v2";
 
-
+// ==========================================================
+// 料件基本資料範例（可直接在這裡新增或刪除）
+// 格式：「料號」:「品名／型號」
+// 新增：在下方加一行，例如 "NEW-001": "新產品型號",
+// 刪除：將不需要的那一整行刪除（注意逗號）
+// ==========================================================
 const DEFAULT_ITEM_MODEL_MAP = {
- 
+  // 範例格式：「料號」:「品名／型號」
+  // 新增：複製一行，修改料號及品名即可；每行結尾加逗號（最後一行可不加）
+  // 刪除：刪除不需要的整行即可
   "ABC-123": "伺服器電源模組 750W",
   "XYZ-888": "工業控制板 V2",
   "A100-01": "馬達驅動器",
@@ -156,10 +163,10 @@ const DEFAULT_ITEM_MODEL_MAP = {
 "CS221120750": "AEVQC-120/750-U2",
 "CS229030500": "AEVQC，DC30kW，CCS1&CHAdeMO雙槍充電樁",
 "CS229150000": "AEVQC，DC150kW，CCS1&CHAdeMO雙槍充電樁",
-"ESCT-TU10-20A": "Split core CT-Type:ESCT-TA10 with HY-Y connector Primary current: 20A-Second output: 100mA"","
-"ESCT-TU16-150A": "Split core CT-Type:ESCT-TA16 with HY-Y connector Primary current: 150A-Second output: 100mA"","
-"ESCT-TU24-300A": "Split core CT-Type:ESCT-TA24 with HY-Y connector Primary current:300A-Second output: 100mA"","
-"ESCT-TU36-600A": "Split core CT-Type:ESCT-TA36 with HY-Y connector Primary current: 600A Second output: 100mA"","
+"ESCT-TU10-20A"": ""Split core CT-Type:ESCT-TA10 with HY-Y connector Primary current: 20A-Second output: 100mA"","
+"ESCT-TU16-150A"": ""Split core CT-Type:ESCT-TA16 with HY-Y connector Primary current: 150A-Second output: 100mA"","
+"ESCT-TU24-300A"": ""Split core CT-Type:ESCT-TA24 with HY-Y connector Primary current:300A-Second output: 100mA"","
+"ESCT-TU36-600A"": ""Split core CT-Type:ESCT-TA36 with HY-Y connector Primary current: 600A Second output: 100mA"","
 "F200015101": "2 port RS-422/485 device server , 10/100M Ethernet , terminal block , 12-30VDC",
 "F200015102": "UPort 1130 / 1 Port USB-to-Serial Adaptor , RS-422/485",
 "GM06121": "12mm (綠)",
@@ -238,7 +245,7 @@ const DEFAULT_ITEM_MODEL_MAP = {
 "Z3-C360500TH": "500A/5A-7.5VA/1.0 (UD-0552-4)",
 "Z3-C360600TH": "600A/5A-12.5VA/1.0 (UD-0552-4)",
 "Z3-C500700TH": "700A/5A-5VA/1.0 (UD-0552-4)",
-"Z3-C500800TH": "800A/5A-12.5VA/1.0 (UD-0552-4)"
+"Z3-C500800TH": "800A/5A-12.5VA/1.0 (UD-0552-4)",
 };
 
 let itemModelMap = {};
