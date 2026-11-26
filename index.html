@@ -67,7 +67,7 @@ th{background:#eaf0f6}.deleteBtn{color:#d00;font-weight:bold;cursor:pointer}
 
 <div class="panel">
   <h3>📚 料件基本資料</h3>
-  <div class="small-note">可匯入 Excel（.xlsx／.xls）或 CSV。第一欄放「料號」、第二欄放「品名／型號」；也可有欄位標題「料號」及「品名／型號」。匯入相同料號時會更新原資料。</div>
+  <div class="small-note">程式內已放入 3 筆示範料件。可直接在程式碼的「料件基本資料範例」區新增或刪除；也可在此頁面新增、編輯、刪除，或匯入 Excel（.xlsx／.xls）及 CSV。第一欄放「料號」、第二欄放「品名／型號」。</div>
   <label for="masterFile">匯入料件基本資料</label>
   <input type="file" id="masterFile" accept=".xlsx,.xls,.csv">
   <div class="status" id="masterStatus">目前基本資料：<span id="masterCount">0</span> 筆</div>
@@ -78,6 +78,7 @@ th{background:#eaf0f6}.deleteBtn{color:#d00;font-weight:bold;cursor:pointer}
   </div>
   <div class="master-actions">
     <button type="button" id="masterExportBtn" style="background:#607D8B;color:white">匯出基本資料</button>
+    <button type="button" id="masterResetBtn" style="background:#1976D2;color:white">重新載入程式碼範例</button>
     <button type="button" id="masterClearBtn" style="background:#eee;color:#333;border:1px solid #bbb">清空基本資料</button>
   </div>
   <div class="table-wrap">
@@ -135,8 +136,22 @@ th{background:#eaf0f6}.deleteBtn{color:#d00;font-weight:bold;cursor:pointer}
 
 <script>
 const $ = id => document.getElementById(id);
-const MASTER_KEY = "inventoryScan_master_v2";
+const MASTER_KEY = "inventoryScan_master_v3";
 const RECORD_KEY = "inventoryScan_records_v2";
+
+// ==========================================================
+// 料件基本資料範例（可直接在這裡新增或刪除）
+// 格式：「料號」:「品名／型號」
+// 新增：在下方加一行，例如 "NEW-001": "新產品型號",
+// 刪除：將不需要的那一整行刪除（注意逗號）
+// ==========================================================
+const DEFAULT_ITEM_MODEL_MAP = {
+  "ABC-123": "伺服器電源模組 750W",
+  "XYZ-888": "工業控制板 V2",
+  "A100-01": "馬達驅動器",
+  "DEMO-004": "示範料件－感測器模組",
+  "DEMO-005": "示範料件－控制器主板"
+};
 
 let itemModelMap = {};
 let records = [];
@@ -318,6 +333,12 @@ $("masterExportBtn").addEventListener("click",()=>{
   if(rows.length===1)return alert("目前沒有料件基本資料可匯出");
   downloadCsv("料件基本資料_"+localDate()+".csv",rows);
 });
+$("masterResetBtn").addEventListener("click",()=>{
+  if(confirm("確定重新載入程式碼中的範例料件？目前頁面上的料件基本資料會被範例取代。")){
+    itemModelMap={...DEFAULT_ITEM_MODEL_MAP};saveMaster();updateModel();
+    alert("已重新載入程式碼中的範例料件。");
+  }
+});
 $("masterClearBtn").addEventListener("click",()=>{
   if(confirm("確定清空全部料件基本資料？此操作不會刪除庫存紀錄。")){itemModelMap={};saveMaster();$("model").value="";}
 });
@@ -329,8 +350,8 @@ $("exportBtn").addEventListener("click",()=>{
   downloadCsv("庫存紀錄_"+localDate()+".csv",rows);
 });
 
-// 初始化：讀取此瀏覽器先前保存的資料
-itemModelMap=safeLoad(MASTER_KEY,{});
+// 初始化：優先讀取此瀏覽器先前保存的資料；第一次開啟時載入上方程式碼中的範例
+itemModelMap=safeLoad(MASTER_KEY,DEFAULT_ITEM_MODEL_MAP);
 records=safeLoad(RECORD_KEY,[]);
 updateMasterTable();renderRecords();updateModel();
 // 初次載入嘗試啟動相機；若瀏覽器阻擋，仍可按「重新掃描」
