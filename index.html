@@ -1,0 +1,695 @@
+
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>庫存掃描系統</title>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+
+<style>
+* { box-sizing:border-box; }
+
+body {
+  margin:0;
+  padding:10px;
+  font-family:Arial,"Microsoft JhengHei",sans-serif;
+  background:#f3f5f8;
+}
+
+.container {
+  max-width:600px;
+  margin:auto;
+  padding:12px;
+  background:white;
+  border-radius:12px;
+  box-shadow:0 2px 12px #0001;
+}
+
+h2 { text-align:center; margin:8px 0 15px; }
+
+.flex-row {
+  display:flex;
+  gap:10px;
+  align-items:center;
+  margin-bottom:15px;
+}
+
+.flex-left { width:50%; }
+
+.flex-right {
+  flex:1;
+  min-width:0;
+}
+
+#video {
+  width:100%;
+  aspect-ratio:1/1;
+  object-fit:cover;
+  border:2px solid #ccc;
+  border-radius:10px;
+}
+
+label {
+  display:block;
+  font-weight:bold;
+  margin:12px 0 5px;
+  color:#444;
+}
+
+input {
+  width:100%;
+  padding:12px;
+  border:1px solid #ccc;
+  border-radius:7px;
+  font-size:17px;
+  min-width:0;
+}
+
+.button-row {
+  display:flex;
+  gap:6px;
+  margin-top:6px;
+}
+
+button {
+  min-height:46px;
+  padding:10px 8px;
+  border:0;
+  border-radius:7px;
+  font-size:16px;
+  font-weight:bold;
+  cursor:pointer;
+  flex:1;
+}
+
+.optionBtn.selected {
+  outline:3px solid #222;
+  outline-offset:-3px;
+  filter:brightness(.85);
+}
+
+/* 儲位 */
+#locationBtns button { background:#2196F3;color:white; }
+
+/* 備註 */
+.red { background:#f44336;color:white; }
+.orange { background:#FF9800;color:white; }
+.green { background:#4CAF50;color:white; }
+.gray { background:#9E9E9E;color:white; }
+
+/* 掃描控制 */
+#rescanBtn {
+  background:white;
+  color:#2196F3;
+  border:2px solid black;
+}
+#stopScanBtn { background:#f44336;color:white; }
+
+/* 儲存及匯出 */
+#saveBtn { background:#FFEB3B;color:black; }
+#exportBtn { background:#FF9800;color:white; }
+
+/* 箱入數 */
+#packBtns button {
+  background:#607D8B;
+  color:white;
+}
+#packBtns button.selected {
+  background:#263238;
+  color:#FFEB3B;
+}
+
+/* 總數 */
+.total-box {
+  margin-top:12px;
+  padding:15px;
+  background:#E8F5E9;
+  border-radius:9px;
+  text-align:center;
+}
+.total-number {
+  font-size:30px;
+  font-weight:bold;
+  color:#16833b;
+}
+
+table {
+  width:100%;
+  border-collapse:collapse;
+  margin-top:12px;
+  min-width:650px;
+}
+
+th,td {
+  border:1px solid #ddd;
+  padding:7px;
+  text-align:center;
+  font-size:13px;
+}
+
+th { background:#eaf0f6; }
+
+.deleteBtn {
+  color:red;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.table-wrap {
+  overflow-x:auto;
+}
+
+@media(max-width:380px) {
+  button { font-size:14px; }
+  .flex-row { gap:7px; }
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<h2>📦 庫存掃描系統</h2>
+
+<!-- 掃描視窗及料號型號 -->
+<div class="flex-row">
+
+  <div class="flex-left">
+    <video id="video" autoplay playsinline muted></video>
+  </div>
+
+  <div class="flex-right">
+    <label>料號</label>
+    <input type="text" id="item"
+      placeholder="掃描或手動輸入">
+
+    <label>型號</label>
+    <input type="text" id="model" readonly>
+  </div>
+
+</div>
+
+<div class="button-row">
+  <button id="rescanBtn">重新掃描</button>
+  <button id="stopScanBtn">停止掃描</button>
+</div>
+
+<!-- 儲位 -->
+<label>儲位</label>
+<div class="button-row" id="locationBtns">
+  <button class="optionBtn" data-value="C10-1">C10-1</button>
+  <button class="optionBtn" data-value="C10-5">C10-5</button>
+</div>
+
+<!-- 箱入數 -->
+<label>每箱入數</label>
+<div class="button-row" id="packBtns">
+  <button class="optionBtn" data-value="12">12 入</button>
+  <button class="optionBtn" data-value="18">18 入</button>
+  <button class="optionBtn" data-value="30">30 入</button>
+</div>
+
+<!-- 箱數 -->
+<label>箱數</label>
+<input type="number" id="boxQty"
+  placeholder="請輸入箱數" min="0" step="1">
+
+<!-- 散裝 -->
+<label>散裝數量</label>
+<input type="number" id="looseQty"
+  placeholder="請輸入散裝數量" min="0" step="1">
+
+<!-- 自動計算 -->
+<div class="total-box">
+  <div>庫存總數</div>
+  <div class="total-number" id="totalQty">0</div>
+  <div>個</div>
+</div>
+
+<!-- 備註 -->
+<label>備註</label>
+<div class="button-row" id="noteBtns">
+  <button class="optionBtn red" data-value="不良">不良</button>
+  <button class="optionBtn orange" data-value="待修">待修</button>
+  <button class="optionBtn green" data-value="待歸位">待歸位</button>
+  <button class="optionBtn gray" data-value="其他">其他</button>
+</div>
+
+<input type="text" id="noteInput"
+  placeholder="請輸入其他原因"
+  style="display:none;">
+
+<!-- 儲存及匯出 -->
+<div class="button-row" style="margin-top:15px;">
+  <button id="saveBtn">儲存</button>
+  <button id="exportBtn">匯出 Excel</button>
+</div>
+
+<h3>📋 庫存紀錄</h3>
+
+<div class="table-wrap">
+<table id="recordTable">
+<thead>
+<tr>
+<th>時間</th>
+<th>料號</th>
+<th>型號</th>
+<th>儲位</th>
+<th>每箱入數</th>
+<th>箱數</th>
+<th>散裝</th>
+<th>總數</th>
+<th>備註</th>
+<th>操作</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+</div>
+
+</div>
+
+<script>
+
+// ===================================
+// 1. 料號與型號對照表
+// ===================================
+
+const itemModelMap = {
+
+  "ABC-123":"伺服器電源模組 750W",
+  "XYZ-888":"工業控制板 V2",
+  "A100-01":"馬達驅動器"
+
+};
+
+// 在上面自行增加料號及型號即可
+
+
+// ===================================
+// 2. 基本設定
+// ===================================
+
+const $ = id => document.getElementById(id);
+
+let selectedLocation = "";
+let selectedPack = "";
+let selectedNote = "";
+
+const video = $("video");
+const canvas = document.createElement("canvas");
+const ctx = canvas.getContext("2d");
+
+let stream = null;
+let scanning = false;
+let animationId = null;
+
+
+// ===================================
+// 3. 料號型號自動對照
+// ===================================
+
+function updateModel() {
+  const code = $("item").value.trim();
+  $("model").value = itemModelMap[code] || "";
+}
+
+$("item").addEventListener("input", updateModel);
+
+
+// ===================================
+// 4. 相機掃描
+// ===================================
+
+async function startCamera() {
+
+  stopCamera();
+
+  if (!navigator.mediaDevices ||
+      !navigator.mediaDevices.getUserMedia) {
+    alert("請使用 HTTPS 網址開啟網頁，才能使用相機");
+    return;
+  }
+
+  try {
+
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: { ideal: "environment" }
+      }
+    });
+
+    video.srcObject = stream;
+    await video.play();
+
+    scanning = true;
+    scanFrame();
+
+  } catch (err) {
+
+    alert("相機無法啟動：" + err.message);
+
+  }
+}
+
+function stopCamera() {
+
+  scanning = false;
+
+  if (animationId) {
+    cancelAnimationFrame(animationId);
+    animationId = null;
+  }
+
+  if (stream) {
+    stream.getTracks().forEach(track => track.stop());
+    stream = null;
+  }
+
+  video.srcObject = null;
+}
+
+function scanFrame() {
+
+  if (!scanning) return;
+
+  if (video.readyState === video.HAVE_ENOUGH_DATA) {
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    ctx.drawImage(video, 0, 0);
+
+    const imageData = ctx.getImageData(
+      0, 0, canvas.width, canvas.height
+    );
+
+    const code = jsQR(
+      imageData.data,
+      imageData.width,
+      imageData.height
+    );
+
+    if (code && code.data) {
+
+      $("item").value = code.data.trim();
+      updateModel();
+
+      stopCamera();
+
+      return;
+    }
+  }
+
+  animationId = requestAnimationFrame(scanFrame);
+}
+
+$("rescanBtn").addEventListener("click", startCamera);
+$("stopScanBtn").addEventListener("click", stopCamera);
+
+
+// ===================================
+// 5. 儲位選擇
+// ===================================
+
+function setupButtons(id, callback) {
+
+  document.querySelectorAll("#" + id + " button")
+    .forEach(btn => {
+
+      btn.addEventListener("click", () => {
+
+        document.querySelectorAll("#" + id + " button")
+          .forEach(b => b.classList.remove("selected"));
+
+        btn.classList.add("selected");
+
+        callback(btn.dataset.value);
+
+      });
+
+    });
+}
+
+setupButtons("locationBtns", value => {
+  selectedLocation = value;
+});
+
+
+// ===================================
+// 6. 每箱入數選擇
+// ===================================
+
+setupButtons("packBtns", value => {
+
+  selectedPack = Number(value);
+  calculateTotal();
+
+});
+
+
+// ===================================
+// 7. 備註選擇
+// ===================================
+
+setupButtons("noteBtns", value => {
+
+  selectedNote = value;
+
+  if (value === "其他") {
+    $("noteInput").style.display = "block";
+  } else {
+    $("noteInput").style.display = "none";
+    $("noteInput").value = "";
+  }
+
+});
+
+
+// ===================================
+// 8. 自動計算總數
+// ===================================
+
+function getNumber(id) {
+
+  const value = $(id).value.trim();
+
+  if (value === "") return 0;
+
+  return Number(value);
+}
+
+function calculateTotal() {
+
+  const boxes = getNumber("boxQty");
+  const loose = getNumber("looseQty");
+
+  const total = boxes * (selectedPack || 0) + loose;
+
+  $("totalQty").textContent = total.toLocaleString();
+
+  return total;
+}
+
+$("boxQty").addEventListener("input", calculateTotal);
+$("looseQty").addEventListener("input", calculateTotal);
+
+
+// ===================================
+// 9. 儲存資料
+// ===================================
+
+$("saveBtn").addEventListener("click", addRecord);
+
+function addRecord() {
+
+  const item = $("item").value.trim();
+  const model = $("model").value;
+  const boxes = $("boxQty").value.trim();
+  const loose = $("looseQty").value.trim();
+
+  const pack = selectedPack;
+  const total = calculateTotal();
+
+  const location = selectedLocation;
+
+  let note = selectedNote === "其他"
+    ? $("noteInput").value.trim()
+    : selectedNote;
+
+  // 資料檢查
+
+  if (!item) {
+    alert("請先掃描或輸入料號");
+    return;
+  }
+
+  if (!location) {
+    alert("請選擇儲位");
+    return;
+  }
+
+  if (!pack) {
+    alert("請選擇每箱入數");
+    return;
+  }
+
+  if (boxes === "" && loose === "") {
+    alert("請輸入箱數或散裝數量");
+    return;
+  }
+
+  if (
+    (boxes !== "" && (!Number.isInteger(Number(boxes)) || Number(boxes) < 0)) ||
+    (loose !== "" && (!Number.isInteger(Number(loose)) || Number(loose) < 0))
+  ) {
+    alert("箱數及散裝數量必須為非負整數");
+    return;
+  }
+
+  if (total <= 0) {
+    alert("總數必須大於 0");
+    return;
+  }
+
+  if (selectedNote === "其他" && !note) {
+    alert("請輸入其他備註原因");
+    return;
+  }
+
+  const time = new Date().toLocaleString("zh-TW", {
+    hour12: false
+  });
+
+  const tbody = $("recordTable").querySelector("tbody");
+  const row = tbody.insertRow();
+
+  const values = [
+    time,
+    item,
+    model,
+    location,
+    pack,
+    boxes || 0,
+    loose || 0,
+    total,
+    note
+  ];
+
+  values.forEach(value => {
+    row.insertCell().textContent = value;
+  });
+
+  const deleteCell = row.insertCell();
+
+  const deleteBtn = document.createElement("span");
+  deleteBtn.textContent = "刪除";
+  deleteBtn.className = "deleteBtn";
+
+  deleteBtn.onclick = () => {
+    if (confirm("確定刪除此筆紀錄？")) {
+      row.remove();
+    }
+  };
+
+  deleteCell.appendChild(deleteBtn);
+
+  resetForm();
+
+  alert("儲存成功！");
+}
+
+
+// ===================================
+// 10. 儲存後清空欄位
+// ===================================
+
+function resetForm() {
+
+  $("item").value = "";
+  $("model").value = "";
+
+  $("boxQty").value = "";
+  $("looseQty").value = "";
+
+  $("totalQty").textContent = "0";
+
+  $("noteInput").value = "";
+  $("noteInput").style.display = "none";
+
+  selectedLocation = "";
+  selectedPack = "";
+  selectedNote = "";
+
+  document.querySelectorAll(".optionBtn")
+    .forEach(btn => btn.classList.remove("selected"));
+
+}
+
+
+// ===================================
+// 11. 匯出 Excel（CSV 格式）
+// ===================================
+
+$("exportBtn").addEventListener("click", () => {
+
+  const table = $("recordTable");
+
+  const rows = [];
+
+  table.querySelectorAll("tr").forEach(row => {
+
+    const cells = Array.from(row.cells);
+
+    const data = cells.slice(0, -1).map(cell => {
+
+      return '"' +
+        cell.innerText.replace(/"/g, '""') +
+        '"';
+
+    });
+
+    rows.push(data.join(","));
+
+  });
+
+  if (rows.length <= 1) {
+    alert("目前沒有資料可以匯出");
+    return;
+  }
+
+  const csv = "\uFEFF" + rows.join("\r\n");
+
+  const blob = new Blob(
+    [csv],
+    { type: "text/csv;charset=utf-8;" }
+  );
+
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+
+  link.href = url;
+
+  link.download =
+    "庫存紀錄_" +
+    new Date().toISOString().slice(0,10) +
+    ".csv";
+
+  link.click();
+
+  URL.revokeObjectURL(url);
+
+});
+
+
+// ===================================
+// 12. 啟動相機
+// ===================================
+
+startCamera();
+
+</script>
+</body>
+</html>
