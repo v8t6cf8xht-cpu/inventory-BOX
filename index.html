@@ -3,420 +3,433 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1976d2">
 <title>庫存掃描系統</title>
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 <style>
 *{box-sizing:border-box}
 body{margin:0;padding:10px;font-family:Arial,"Microsoft JhengHei",sans-serif;background:#f3f5f8;color:#222}
-.container{max-width:700px;margin:auto;padding:12px;background:#fff;border-radius:12px;box-shadow:0 2px 12px #0001}
-h2{text-align:center;margin:8px 0 15px}h3{margin:20px 0 8px}
-.flex-row{display:flex;gap:10px;align-items:center;margin-bottom:12px}
-.flex-left{width:50%}.flex-right{flex:1;min-width:0}
-#video{width:100%;aspect-ratio:1/1;object-fit:cover;border:2px solid #ccc;border-radius:10px;background:#111}
-label{display:block;font-weight:bold;margin:12px 0 5px;color:#444}
-input{width:100%;padding:12px;border:1px solid #ccc;border-radius:7px;font-size:16px;min-width:0}
-input[type=file]{font-size:14px;padding:9px;background:#fff}
-.button-row{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
-button{min-height:44px;padding:10px 8px;border:0;border-radius:7px;font-size:15px;font-weight:bold;cursor:pointer;flex:1}
+.container{max-width:760px;margin:auto;padding:14px;background:#fff;border-radius:14px;box-shadow:0 2px 12px #0001}
+h2{text-align:center;margin:8px 0 14px}h3{margin:20px 0 8px}
+button{min-height:43px;padding:10px 12px;border:0;border-radius:8px;font-size:14px;font-weight:bold;cursor:pointer}
 button:active{transform:scale(.99)}
+input{width:100%;padding:12px;border:1px solid #cbd1d8;border-radius:8px;font-size:16px;min-width:0;background:#fff}
+label{display:block;font-weight:bold;margin:12px 0 5px;color:#444}
+.button-row{display:flex;gap:7px;margin-top:7px;flex-wrap:wrap}
+.button-row button{flex:1;min-width:76px}
+.flex-row{display:flex;gap:12px;align-items:center;margin-bottom:8px}
+.flex-left{width:46%;min-width:0}.flex-right{flex:1;min-width:0}
+#video{width:100%;aspect-ratio:1/1;object-fit:cover;border:2px solid #d2d7de;border-radius:10px;background:#111}
+.status{font-size:13px;color:#555;margin-top:7px;min-height:18px;line-height:1.5}
+#rescanBtn{background:#1976d2;color:#fff}#stopScanBtn{background:#e53935;color:#fff}
+#locationBtns button{background:#2196f3;color:#fff;min-width:18%}
+#packBtns button{background:#607d8b;color:#fff}
 .optionBtn.selected{outline:3px solid #222;outline-offset:-3px;filter:brightness(.82)}
-#locationBtns button{background:#2196F3;color:#fff;min-width:18%}
-.red{background:#f44336;color:#fff}.orange{background:#FF9800;color:#fff}.green{background:#4CAF50;color:#fff}.gray{background:#9E9E9E;color:#fff}
-#rescanBtn{background:#fff;color:#2196F3;border:2px solid #222}
-#stopScanBtn{background:#f44336;color:#fff}
-#saveBtn{background:#FFEB3B;color:#000}#exportBtn{background:#FF9800;color:#fff}
-#packBtns button{background:#607D8B;color:#fff}
-#packBtns button.selected{background:#263238;color:#FFEB3B}
-.total-box{margin-top:12px;padding:14px;background:#E8F5E9;border-radius:9px;text-align:center}
+#packBtns button.selected{background:#263238;color:#ffeb3b}
+.red{background:#f44336;color:#fff}.orange{background:#ff9800;color:#fff}.green{background:#4caf50;color:#fff}.gray{background:#888;color:#fff}
+.total-box{margin-top:12px;padding:14px;background:#e8f5e9;border-radius:10px;text-align:center}
 .total-number{font-size:30px;font-weight:bold;color:#16833b}
+.master-summary{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px;margin:12px 0 16px;background:#e8f5e9;border:1px solid #c8e6c9;border-radius:10px}
+.master-summary-title{font-weight:bold}.master-count{font-size:13px;color:#555;margin-top:4px}.master-count strong{font-size:23px;color:#16833b}
+#openMasterBtn{background:#1976d2;color:#fff;white-space:nowrap}
 .panel{margin-top:16px;padding:12px;background:#f7f9fc;border:1px solid #e0e5eb;border-radius:10px}
-.panel h3{margin-top:0}
-.small-note{font-size:13px;color:#666;line-height:1.5;margin:6px 0}
-table{width:100%;border-collapse:collapse;margin-top:10px;min-width:650px}
-th,td{border:1px solid #ddd;padding:7px;text-align:center;font-size:13px}
-th{background:#eaf0f6}.deleteBtn{color:#d00;font-weight:bold;cursor:pointer}
-.table-wrap{overflow-x:auto}
-.master-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-.master-actions button{min-width:110px}
-#masterForm{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-#masterForm button{grid-column:1/-1;background:#1976D2;color:#fff}
-#masterCount{font-weight:bold;color:#176b35}
-.status{font-size:13px;color:#555;margin-top:6px;min-height:18px}
-@media(max-width:420px){button{font-size:14px}.flex-row{gap:7px}#masterForm{grid-template-columns:1fr}#masterForm button{grid-column:auto}#locationBtns button{min-width:28%}}
+.small-note{font-size:13px;color:#666;line-height:1.55;margin:6px 0}
+.table-wrap{overflow-x:auto;width:100%}
+table{width:100%;border-collapse:collapse;margin-top:10px;min-width:680px}
+th,td{border:1px solid #ddd;padding:8px;text-align:center;font-size:13px;overflow-wrap:anywhere}
+th{background:#eaf0f6}.deleteBtn{color:#c62828;font-weight:bold;cursor:pointer}
+#saveBtn{background:#ffeb3b;color:#222;flex:1}#exportBtn{background:#ff9800;color:#fff;flex:1}
+
+/* 料件主檔彈出視窗 */
+.master-modal{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.58);padding:12px;align-items:center;justify-content:center}
+.master-modal.show{display:flex}
+.master-window{width:100%;max-width:680px;max-height:88vh;background:#fff;border-radius:14px;padding:15px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 8px 30px #0003}
+.master-header{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
+.master-header h3{margin:0 0 4px}.master-header small{color:#666}
+#closeMasterBtn{width:40px;min-width:40px;padding:0;border-radius:50%;background:#eee;color:#333;font-size:19px}
+#masterSearch{margin-bottom:10px}
+.master-list-wrap{overflow:auto;flex:1;min-height:100px}
+.master-table{min-width:0;table-layout:fixed;margin:0}
+.master-table th{position:sticky;top:0;z-index:1}
+.master-table th:first-child,.master-table td:first-child{width:42%;font-weight:bold}
+.master-table th,.master-table td{text-align:left;padding:9px 7px;font-size:13px;overflow-wrap:anywhere}
+.master-footer{display:flex;justify-content:space-between;align-items:center;gap:10px;padding-top:12px}
+.master-footer span{font-size:13px;color:#666}
+#closeMasterFooter{background:#1976d2;color:#fff;min-width:85px}
+.empty-row{text-align:center!important;color:#777;padding:20px!important}
+@media(max-width:480px){body{padding:6px}.container{padding:10px}.flex-row{gap:8px}.flex-left{width:43%}button{font-size:13px;padding:9px 7px}#locationBtns button{min-width:28%}.master-window{padding:12px}.master-table th,.master-table td{font-size:12px;padding:8px 5px}}
 </style>
 </head>
 <body>
 <div class="container">
-<h2>📦 庫存掃描系統</h2>
+  <h2>📦 庫存掃描系統</h2>
 
-<div class="flex-row">
-  <div class="flex-left"><video id="video" autoplay playsinline muted></video></div>
-  <div class="flex-right">
-    <label for="item">料號</label>
-    <input type="text" id="item" placeholder="掃描或手動輸入">
-    <label for="model">型號／品名</label>
-    <input type="text" id="model" readonly placeholder="依料件基本資料自動帶出">
+  <!-- 平常只顯示筆數；按鈕才開啟完整料件清單 -->
+  <div class="master-summary">
+    <div>
+      <div class="master-summary-title">📚 料件主檔</div>
+      <div class="master-count">目前共 <strong id="masterCount">0</strong> 筆資料</div>
+    </div>
+    <button type="button" id="openMasterBtn">📋 查看料件</button>
   </div>
-</div>
-<div class="status" id="cameraStatus">請按「啟動相機」，並允許瀏覽器使用相機。</div>
-<div class="button-row">
-  <button id="rescanBtn" style="background:#1976D2;color:white">啟動相機／重新掃描</button>
-  <button id="stopScanBtn">停止掃描</button>
-</div>
 
-<div class="panel">
-  <h3>📚 料件基本資料（直接修改程式碼）</h3>
-  <div class="small-note">料件資料已直接寫在程式碼中，不需要上傳 Excel。要新增或刪除料件，請編輯程式碼內的 DEFAULT_ITEM_MODEL_MAP 區段。下方只顯示目前程式碼內的料件清單。</div>
-  <div class="status">目前料件：<span id="masterCount">0</span> 筆</div>
+  <div class="flex-row">
+    <div class="flex-left"><video id="video" autoplay playsinline muted></video></div>
+    <div class="flex-right">
+      <label for="item">料號</label>
+      <input type="text" id="item" placeholder="掃描或手動輸入" autocomplete="off">
+      <label for="model">型號／品名</label>
+      <input type="text" id="model" readonly placeholder="依料件主檔自動帶出">
+    </div>
+  </div>
+  <div class="status" id="cameraStatus">請按「啟動相機」，並允許瀏覽器使用相機。</div>
+  <div class="button-row">
+    <button type="button" id="rescanBtn">啟動相機／重新掃描</button>
+    <button type="button" id="stopScanBtn">停止掃描</button>
+  </div>
+
+  <label>儲位</label>
+  <div class="button-row" id="locationBtns">
+    <button type="button" class="optionBtn" data-value="C10-1">C10-1</button>
+    <button type="button" class="optionBtn" data-value="C10-2">C10-2</button>
+    <button type="button" class="optionBtn" data-value="C10-3">C10-3</button>
+    <button type="button" class="optionBtn" data-value="C10-4">C10-4</button>
+    <button type="button" class="optionBtn" data-value="C10-5">C10-5</button>
+  </div>
+
+  <label>每箱入數</label>
+  <div class="button-row" id="packBtns">
+    <button type="button" class="optionBtn" data-value="12">12 入</button>
+    <button type="button" class="optionBtn" data-value="18">18 入</button>
+    <button type="button" class="optionBtn" data-value="30">30 入</button>
+  </div>
+
+  <label for="boxQty">箱數</label>
+  <input type="number" id="boxQty" placeholder="請輸入箱數" min="0" step="1" inputmode="numeric">
+  <label for="looseQty">散裝數量</label>
+  <input type="number" id="looseQty" placeholder="請輸入散裝數量" min="0" step="1" inputmode="numeric">
+  <div class="total-box"><div>庫存總數</div><div class="total-number" id="totalQty">0</div><div>個</div></div>
+
+  <label>備註</label>
+  <div class="button-row" id="noteBtns">
+    <button type="button" class="optionBtn red" data-value="不良">不良</button>
+    <button type="button" class="optionBtn orange" data-value="待修">待修</button>
+    <button type="button" class="optionBtn green" data-value="待歸位">待歸位</button>
+    <button type="button" class="optionBtn gray" data-value="其他">其他</button>
+  </div>
+  <input type="text" id="noteInput" placeholder="請輸入其他原因" style="display:none;margin-top:8px">
+
+  <div class="button-row" style="margin-top:15px">
+    <button type="button" id="saveBtn">儲存</button>
+    <button type="button" id="exportBtn">匯出庫存紀錄</button>
+  </div>
+
+  <h3>📋 庫存紀錄</h3>
+  <div class="small-note">紀錄會自動保存在目前這台裝置的瀏覽器中。清除瀏覽器資料或更換裝置前，請先匯出備份。</div>
   <div class="table-wrap">
-    <table id="masterTable">
-      <thead><tr><th>料號</th><th>品名／型號</th></tr></thead>
+    <table id="recordTable">
+      <thead><tr><th>時間</th><th>料號</th><th>型號</th><th>儲位</th><th>每箱入數</th><th>箱數</th><th>散裝</th><th>總數</th><th>備註</th><th>操作</th></tr></thead>
       <tbody></tbody>
     </table>
   </div>
 </div>
 
-<label>儲位</label>
-<div class="button-row" id="locationBtns">
-  <button class="optionBtn" data-value="C10-1">C10-1</button>
-  <button class="optionBtn" data-value="C10-2">C10-2</button>
-  <button class="optionBtn" data-value="C10-3">C10-3</button>
-  <button class="optionBtn" data-value="C10-4">C10-4</button>
-  <button class="optionBtn" data-value="C10-5">C10-5</button>
-</div>
-
-<label>每箱入數</label>
-<div class="button-row" id="packBtns">
-  <button class="optionBtn" data-value="12">12 入</button>
-  <button class="optionBtn" data-value="18">18 入</button>
-  <button class="optionBtn" data-value="30">30 入</button>
-</div>
-
-<label for="boxQty">箱數</label>
-<input type="number" id="boxQty" placeholder="請輸入箱數" min="0" step="1">
-<label for="looseQty">散裝數量</label>
-<input type="number" id="looseQty" placeholder="請輸入散裝數量" min="0" step="1">
-<div class="total-box"><div>庫存總數</div><div class="total-number" id="totalQty">0</div><div>個</div></div>
-
-<label>備註</label>
-<div class="button-row" id="noteBtns">
-  <button class="optionBtn red" data-value="不良">不良</button>
-  <button class="optionBtn orange" data-value="待修">待修</button>
-  <button class="optionBtn green" data-value="待歸位">待歸位</button>
-  <button class="optionBtn gray" data-value="其他">其他</button>
-</div>
-<input type="text" id="noteInput" placeholder="請輸入其他原因" style="display:none;margin-top:8px">
-
-<div class="button-row" style="margin-top:15px">
-  <button id="saveBtn">儲存</button>
-  <button id="exportBtn">匯出庫存紀錄</button>
-</div>
-<h3>📋 庫存紀錄</h3>
-<div class="small-note">紀錄會自動保存在目前這台裝置的瀏覽器中；清除瀏覽器資料或更換裝置前，請先匯出備份。</div>
-<div class="table-wrap">
-<table id="recordTable">
-<thead><tr><th>時間</th><th>料號</th><th>型號</th><th>儲位</th><th>每箱入數</th><th>箱數</th><th>散裝</th><th>總數</th><th>備註</th><th>操作</th></tr></thead>
-<tbody></tbody>
-</table>
-</div>
+<!-- 料件主檔彈出視窗 -->
+<div id="masterModal" class="master-modal" role="dialog" aria-modal="true" aria-labelledby="masterTitle">
+  <div class="master-window">
+    <div class="master-header">
+      <div>
+        <h3 id="masterTitle">📋 料件主檔清單</h3>
+        <small id="modalMasterCount">共 0 筆資料</small>
+      </div>
+      <button type="button" id="closeMasterBtn" aria-label="關閉">✕</button>
+    </div>
+    <input type="search" id="masterSearch" placeholder="🔍 搜尋料號或型號／品名…" autocomplete="off">
+    <div class="master-list-wrap">
+      <table class="master-table">
+        <thead><tr><th>料號</th><th>型號／品名</th></tr></thead>
+        <tbody id="masterList"></tbody>
+      </table>
+    </div>
+    <div class="master-footer">
+      <span id="masterResultCount">顯示 0 筆</span>
+      <button type="button" id="closeMasterFooter">關閉視窗</button>
+    </div>
+  </div>
 </div>
 
 <script>
+'use strict';
 const $ = id => document.getElementById(id);
-const RECORD_KEY = "inventoryScan_records_v2";
+const RECORD_KEY = 'inventoryScan_records_v2';
 
 // ==========================================================
-// 料件基本資料範例（可直接在這裡新增或刪除）
-// 格式：「料號」:「品名／型號」
-// 新增：在下方加一行，例如 "NEW-001": "新產品型號",
-// 刪除：將不需要的那一整行刪除（注意逗號）
+// 料件基本資料：直接在此新增或刪除，不需要上傳 Excel
+// 新增格式："新料號": "型號／品名",
+// 刪除時刪除整行；最後一筆後面不加逗號也可以。
+// 料號會完整比對，只忽略輸入內容前後空白，不會刪除連字號或改大小寫。
 // ==========================================================
 const DEFAULT_ITEM_MODEL_MAP = {
-  // 範例格式：「料號」:「品名／型號」
-  // 新增：複製一行，修改料號及品名即可；每行結尾加逗號（最後一行可不加）
-  // 刪除：刪除不需要的整行即可
-  "ABC-123": "伺服器電源模組 750W",
-  "XYZ-888": "工業控制板 V2",
-  "A100-01": "馬達驅動器",
-  "DEMO-004": "示範料件－感測器模組",
-  "DEMO-005": "示範料件－控制器主板",
-  "NEW-001": "新產品範例－電源供應器 500W",
-  "NEW-002": "新產品範例－工業感測器",
   "A115000100": "電源變壓器BAW-RA KG- 9V1.3A",
-"A115000300": "Optical head",
-"A115000400": "Signal cable",
-"A1240001-00": "電表電池 FDK-CR2/3-8LHT-CN240S",
-"A1240002-00": "AMI電表電池 TOSHIBA ER4V 3.6V-1200mAh",
-"A124902300": "插座組立圓表",
-"AC1XXXXX220N": "箱體內含 BAW-2ACBA計費電表+BAW-RL讀卡機",
-"AN00X000110D": "MPC-20D 雙向地插110V",
-"AN00X000110S": "MPC-20S 單向地插110V",
-"C111700153-00": "EPE / 35*5*1 cm (三相用)",
-"C111700448-00": "BAW瓦時計外箱(30入) /52.9 x 28.8 x 17.8cm  巧力LOGO (20171123版)",
-"C111700548-00": "BAW瓦時計外箱(12入) / 37.6 x 34.4 x 22.3cm  巧力LOGO (20171123版)",
-"CC115007220L": "7KW SAE  美標交流充電樁(含螢幕板)",
-"CC115007220Y": "7KW SAE  裕電美標交流充電樁(含螢幕板)",
-"CC3XSXXXXX": "勞務費(含售服、重工、場勘、檢測驗証)",
-"CL02": "勞務費(含售服、重工、場勘、檢測驗証)",
-"CN115007220L": "7KW SAE  美標交流充電樁(含螢幕板+扣款機)",
-"CRJ-31-100MA": "Primary current: 20~600A-Second output: 100mA",
-"CS221120750": "AEVQC-120/750-U2",
-"CS229030500": "AEVQC，DC30kW，CCS1&CHAdeMO雙槍充電樁",
-"CS229150000": "AEVQC，DC150kW，CCS1&CHAdeMO雙槍充電樁",
-"ESCT-TU10-20A": "Split core CT-Type:ESCT-TA10 with HY-Y connector Primary current: 20A-Second output: 100mA",
-"ESCT-TU16-150A": "Split core CT-Type:ESCT-TA16 with HY-Y connector Primary current: 150A-Second output: 100mA",
-"ESCT-TU24-300A": "Split core CT-Type:ESCT-TA24 with HY-Y connector Primary current:300A-Second output: 100mA",
-"ESCT-TU36-600A": "Split core CT-Type:ESCT-TA36 with HY-Y connector Primary current: 600A Second output: 100mA",
-"F200015101": "2 port RS-422/485 device server , 10/100M Ethernet , terminal block , 12-30VDC",
-"F200015102": "UPort 1130 / 1 Port USB-to-Serial Adaptor , RS-422/485",
-"GM06121": "12mm (綠)",
-"GZ115007240B": "SAEJ1772 7kW (黑5m) Voltage:240VAC Current:32A (耐電壓2000V AC)",
-"IN300000000": "MIFARE卡片",
-"P111000100": "電子式瓦時計 BEW-1ABA/1P2W 110V 10(40)A 60Hz",
-"P111000400": "電子式瓦時計 BAW-1HBA/1P2W 110-220V 10(50)A 60Hz  TV220",
-"P111000500": "電子式瓦時計 BAW-1HCA/1P2W 110-220V 20(80)A 60Hz TV220V",
-"P111000600": "電子式瓦時計 BAW-1HBA/1P2W 110-220V 10(80)A 60Hz  TV220",
-"P114000100": "通訊型電子式電表 BAW-1CBBA 1P2W 220V 10(50)A 60Hz (兼容110V)(RS485)",
-"P114000300": "通訊型電子式電表 BAW-1CHBA 1P2W 110-220V 10(80)A 60Hz TV220V (RS485)",
-"P115000100": "預付費電表 BAW-1ABBA/1P2W 220V 10(50)A 60Hz",
-"P115000300": "讀卡機 BAW-RL",
-"P115000800": "IC卡用電預付費裝置 BAW-RA 加值機 ( 附電源變壓器、管理卡、費率卡 )",
-"P115000901": "預付費電表 BAW-1AHBA/1P2W 110-220V 10(80)A 60Hz TV220",
-"P115001200": "BAW-RA 加值機",
-"P117000100": "DIN Rail Electronic Energy Meter CED-1CBEA/1P2W 220V 5(100)A 50/60Hz CL.1",
-"P118000100": "電子式瓦時計 BAW-1DHBA 1P2W 110-220V 10(80)A 60Hz",
-"P121000300": "電子式瓦時計 BAW-2CBA/1P3W 110/220V 10(50)A 60Hz",
-"P121000400": "電子式瓦時計 BAW-2CCA/1P3W 110/220V 20(80)A 60Hz",
-"P121000500": "電子式瓦時計 BAW-2CBA/1P3W 110/220V 10(80)A 60Hz",
-"P122000100": "電子式瓦時計 BEW-3BAA/3P3W 220V 5A 60Hz",
-"P122000400": "電子式瓦時計 BAW-3HAA/3P3W 110-220V 5(20)A 60Hz TV220V",
-"P122000500": "電子式瓦時計 BAW-3HBA/3P3W 110-220V 10(50)A 60Hz TV220V",
-"P122000600": "電子式瓦時計 BAW-3HCA/3P3W 110-220V 20(100)A 60Hz TV220",
-"P122000700": "電子式瓦時計 BAW-3HBA/3P3W 110-220V 10(100)A 60Hz TV220",
-"P123000100": "電子式瓦時計 BAW-2DCBA 1P3W 110/220V 10(80)A 60Hz",
-"P125000100": "通訊型電子式電表 BAW-2CCBA 1P3W 110/220V 10(50)A 60Hz (RS485)",
-"P125000200": "通訊型電子式電表 BAW-2CCCA 1P3W 110/220V 20(80)A 60Hz (RS485)",
-"P125000300": "通訊型電子式電表 BAW-2CCBA 1P3W 110/220V 10(80)A 60Hz (RS485)",
-"P126000100": "通訊型電子式電表 BAW-3CHAA 3P3W 110-220V 5(20)A 60Hz TV220V (RS485)",
-"P126000200": "通訊型電子式電表 BAW-3CBBA 3P3W 220V 10(50)A 60Hz (兼容110V)(RS485)",
-"P126000300": "通訊型電子式電表 BAW-3CBCA 3P3W 220V 20(100)A 60Hz (兼容110V)(RS485)",
-"P126000400": "通訊型電子式電表 BAW-3CHBA 3P3W 110-220V 10(100)A 60Hz TV220V (RS485)",
-"P128000100": "預付費電表 BAW-2ACBA/1P3W 110/220V 10(50)A 60Hz",
-"P128000400": "預付費電表 BAW-2ACBA/1P3W 110/220V 10(80)A 60Hz",
-"P131000100": "電子式瓦時計 BEW-4EAA/3P4W 120/208V 5A 60Hz(兼容110/190V)",
-"P131000200": "電子式瓦時計 BEW-4EBA/3P4W 120/208V 10(50)A 60Hz(兼容110/190V)",
-"P131000300": "電子式瓦時計 BEW-4ECA/3P4W 120/208V 20(100)A 60Hz(兼容110/190V)",
-"P131000700": "電子式瓦時計 BAW-4GAA/3P4W 110-480V 5(20)A 60Hz",
-"P131000800": "電子式瓦時計 BAW-4GBA/3P4W 110-480V 10(50)A 60Hz",
-"P131000900": "電子式瓦時計 BAW-4GCA/3P4W 110-480V 20(100)A 60Hz",
-"P131001000": "電子式瓦時計 BAW-4GBA/3P4W 110-480V 10(100)A 60Hz",
-"P133000100": "通訊型電子式電表 BAW-4CGAA 3P4W 110-480V 5(20)A 60Hz TV110 (RS485)",
-"P133000200": "通訊型電子式電表 BAW-4CGBA 3P4W 110-480V 10(50)A 60Hz (RS485)",
-"P133000300": "通訊型電子式電表 BAW-4CGCA 3P4W 110-480V 20(100)A 60Hz (RS485)",
-"P133000400": "通訊型電子式電表 BAW-4CGBA 3P4W 110-480V 10(100)A 60Hz TV110 (RS485)",
-"P135000100": "DIN Rail Electronic Energy MeterCED-4CFEA/3P4W 220/380V 5(80)A 50/60Hz CL.1",
-"P135000101": "CED-4CFBA 3P4W 230/400V 10(100)A 50/60Hz",
-"P135000200": "DIN Rail Electronic Energy Meter CED-4CFAA/3P4W 220/380V 1.5(6)A 50/60Hz CL.1 附變比器用",
-"P135000201": "CED-4CFAA 3P4W 230/400V 5(6)A 50/60Hz",
-"P135000500": "CED-4C ML Multi-parameters 1p2w, 1p3w,3p3w,3p4w",
-"P136000100": "CMFM-F 3P4W 50-600V  1A/5A 45-66Hz  CL0.5",
-"P136000200": "CMFM-G 3P4W 50-600V  1A/5A 45-66Hz  CL0.5 TOU",
-"RJ12-100": "10.0 meter",
-"RN3XU": "USB加值機(PR-500MN)",
-"SN20X006110": "電動機車充電樁(1對6)",
-"SN20X006110MT": "電動機車充電樁(1對6)投幣式+MIFARE+網路",
-"SN20X012110": "電動機車充電樁(1對12)",
-"TC10ZZZZZZB": "交流立柱(雙背)",
-"TC10ZZZZZZZ": "交流立柱",
-"TL10Z1150370": "規格：高1150mm、底座370*300mm",
-"TN10Z020110": "260/261機車樁系列專用立柱",
-"XYZ-27": "樣品費",
-"XYZ-32": "其它費用",
-"XZROGO-RCC122i105B2": "1250A/1A , Window size 105mm / Coil Length 378mm ( Note: 此產品包含羅氏線圈探頭*3+1A輸出三相積分器+12V/15W電源供應器)",
-"XZROGO-RCC801i080B1": "800A/1A , Window size 80mm / Coil Length 300mm ( Note: 此產品包含羅氏線圈探頭*3+1A輸出三相積分器+12V/15W電源供應器 )",
-"Z3-C160120TH": "120A/1A-1VA/1.0",
-"Z3-C240050TH": "50A/5A-0.5VA/5.0",
-"Z3-C240100TH": "100A/5A-1VA/1.0 (UD-0552-4)",
-"Z3-C240150TH": "150A/5A-1VA/1.0 (UD-0552-4)",
-"Z3-C240200TH": "200A/5A-1VA/1.0 (UD-0552-4)",
-"Z3-C240250TH": "-250A/5A-1VA/1.0 (UD-0552-4)",
-"Z3-C240300TH": "300A/5A-2.5VA/1.0 (UD-0552-4)",
-"Z3-C360400TH": "400A/5A -2.5VA/1.0(UD-0552-4)",
-"Z3-C360500TH": "500A/5A-7.5VA/1.0 (UD-0552-4)",
-"Z3-C360600TH": "600A/5A-12.5VA/1.0 (UD-0552-4)",
-"Z3-C500700TH": "700A/5A-5VA/1.0 (UD-0552-4)",
-"Z3-C500800TH": "800A/5A-12.5VA/1.0 (UD-0552-4)",
+  "A115000300": "Optical head",
+  "A115000400": "Signal cable",
+  "A1240001-00": "電表電池 FDK-CR2/3-8LHT-CN240S",
+  "A1240002-00": "AMI電表電池 TOSHIBA ER4V 3.6V-1200mAh",
+  "A124902300": "插座組立圓表",
+  "AC1XXXXX220N": "箱體內含 BAW-2ACBA計費電表+BAW-RL讀卡機",
+  "AN00X000110D": "MPC-20D 雙向地插110V",
+  "AN00X000110S": "MPC-20S 單向地插110V",
+  "C111700153-00": "EPE / 35*5*1 cm (三相用)"
 };
 
-let itemModelMap = {};
+let itemModelMap = { ...DEFAULT_ITEM_MODEL_MAP };
 let records = [];
-let selectedLocation = "";
+let selectedLocation = '';
 let selectedPack = 0;
-let selectedNote = "";
-const video = $("video");
-const canvas = document.createElement("canvas");
-const ctx = canvas.getContext("2d");
-let stream = null, scanning = false, animationId = null;
+let selectedNote = '';
+const video = $('video');
+const canvas = document.createElement('canvas');
+const ctx = canvas.getContext('2d', { willReadFrequently: true });
+let stream = null;
+let scanning = false;
+let animationId = null;
 
 function safeLoad(key, fallback) {
-  try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; }
-  catch(e) { return fallback; }
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch (e) { return fallback; }
 }
-function saveRecords() { localStorage.setItem(RECORD_KEY, JSON.stringify(records)); renderRecords(); }
+function saveRecords() {
+  try { localStorage.setItem(RECORD_KEY, JSON.stringify(records)); }
+  catch (e) { alert('儲存失敗：瀏覽器儲存空間可能不足，請先匯出備份。'); }
+  renderRecords();
+}
 function updateModel() {
-  const code = $("item").value.trim();
-  $("model").value = itemModelMap[code] || "";
+  const code = $('item').value.trim();
+  $('model').value = Object.prototype.hasOwnProperty.call(itemModelMap, code) ? itemModelMap[code] : '';
 }
-$("item").addEventListener("input", updateModel);
+$('item').addEventListener('input', updateModel);
 
+// 相機必須由使用者按按鈕啟動；網頁載入時不會自動要求相機權限。
 async function startCamera() {
   stopCamera(false);
   if (!window.isSecureContext || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-    $("cameraStatus").textContent = "無法使用相機：請確認使用 GitHub Pages 的 https:// 網址開啟，不要用檔案方式直接開啟 index.html。";
+    $('cameraStatus').textContent = '無法使用相機：請透過 GitHub Pages 的 https:// 網址開啟，不要直接以檔案方式開啟。';
     return;
   }
-  $("cameraStatus").textContent = "正在請求相機權限，請在瀏覽器視窗按允許…";
+  if (!window.jsQR) {
+    $('cameraStatus').textContent = 'QR 掃描程式載入失敗，請確認網路連線後重新整理網頁。';
+    return;
+  }
+  $('cameraStatus').textContent = '正在啟動相機，請允許瀏覽器使用相機…';
   try {
     let s;
     try {
-      // 優先使用手機後置鏡頭
-      s = await navigator.mediaDevices.getUserMedia({
-        audio: false,
-        video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } }
-      });
-    } catch (firstError) {
-      // 某些裝置不接受 facingMode 設定，改用一般相機條件再試一次
-      s = await navigator.mediaDevices.getUserMedia({ audio: false, video: true });
+      s = await navigator.mediaDevices.getUserMedia({ audio:false, video:{ facingMode:{ ideal:'environment' }, width:{ ideal:1280 }, height:{ ideal:720 } } });
+    } catch (e) {
+      s = await navigator.mediaDevices.getUserMedia({ audio:false, video:true });
     }
     stream = s;
-    video.setAttribute("playsinline", "true");
-    video.muted = true;
     video.srcObject = stream;
     await video.play();
     scanning = true;
-    $("cameraStatus").textContent = "相機掃描中，請將 QR Code 對準鏡頭。";
+    $('cameraStatus').textContent = '相機掃描中，請將 QR Code 對準鏡頭。';
     scanFrame();
   } catch (err) {
-    let msg = err.message || "未知錯誤";
-    if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") msg = "相機權限被拒絕。請點網址列左側的鎖頭／網站設定，將相機改為允許，再重新啟動。";
-    else if (err.name === "NotFoundError" || err.name === "DevicesNotFoundError") msg = "找不到可用的相機，請確認裝置有相機且沒有被其他程式占用。";
-    else if (err.name === "NotReadableError" || err.name === "TrackStartError") msg = "相機可能正被其他程式使用，請關閉相機程式或其他分頁後再試。";
-    else if (err.name === "NotSupportedError" || err.name === "SecurityError") msg = "瀏覽器不支援或目前網頁不是安全連線，請使用最新版 Chrome／Safari 並透過 HTTPS 開啟。";
-    $("cameraStatus").textContent = "相機啟動失敗：「" + msg + "」";
+    let msg = err.message || '未知錯誤';
+    if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') msg = '相機權限被拒絕。請到網址列左側網站設定，將相機改為允許後再試。';
+    else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') msg = '找不到可用相機，請確認裝置有相機。';
+    else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') msg = '相機可能正被其他程式或分頁使用，請關閉後再試。';
+    else if (err.name === 'NotSupportedError' || err.name === 'SecurityError') msg = '瀏覽器不支援或網頁不是安全連線，請使用最新版 Chrome／Safari 並透過 HTTPS 開啟。';
+    $('cameraStatus').textContent = '相機啟動失敗：' + msg;
   }
 }
 function stopCamera(showStatus = true) {
   scanning = false;
-  if (animationId) { cancelAnimationFrame(animationId); animationId = null; }
-  if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+  if (animationId !== null) { cancelAnimationFrame(animationId); animationId = null; }
+  if (stream) { stream.getTracks().forEach(track => track.stop()); stream = null; }
   video.srcObject = null;
-  if (showStatus && $("cameraStatus")) $("cameraStatus").textContent = "相機已停止。";
+  if (showStatus) $('cameraStatus').textContent = '相機已停止。';
 }
 function scanFrame() {
   if (!scanning) return;
-  if (video.readyState === video.HAVE_ENOUGH_DATA) {
-    canvas.width = video.videoWidth; canvas.height = video.videoHeight;
-    if (canvas.width && canvas.height) {
-      ctx.drawImage(video,0,0);
-      const imageData = ctx.getImageData(0,0,canvas.width,canvas.height);
-      const code = window.jsQR ? jsQR(imageData.data,imageData.width,imageData.height) : null;
-      if (code && code.data) {
-        $("item").value = code.data.trim(); updateModel(); stopCamera();
-        $("cameraStatus").textContent = "掃描完成：" + $("item").value;
+  if (video.readyState === video.HAVE_ENOUGH_DATA && video.videoWidth && video.videoHeight) {
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    try {
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const result = window.jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts:'dontInvert' });
+      if (result && result.data) {
+        $('item').value = result.data.trim();
+        updateModel();
+        stopCamera(false);
+        $('cameraStatus').textContent = '掃描完成：' + $('item').value;
         return;
       }
+    } catch (e) {
+      $('cameraStatus').textContent = '讀取影像失敗，請重新啟動相機。';
     }
   }
   animationId = requestAnimationFrame(scanFrame);
 }
-$("rescanBtn").addEventListener("click", startCamera);
-$("stopScanBtn").addEventListener("click", stopCamera);
+$('rescanBtn').addEventListener('click', startCamera);
+$('stopScanBtn').addEventListener('click', () => stopCamera(true));
 
 function setupButtons(id, callback) {
-  document.querySelectorAll("#"+id+" button").forEach(btn => btn.addEventListener("click", () => {
-    document.querySelectorAll("#"+id+" button").forEach(b => b.classList.remove("selected"));
-    btn.classList.add("selected"); callback(btn.dataset.value);
+  document.querySelectorAll('#' + id + ' button').forEach(btn => btn.addEventListener('click', () => {
+    document.querySelectorAll('#' + id + ' button').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    callback(btn.dataset.value);
   }));
 }
-setupButtons("locationBtns", v => selectedLocation = v);
-setupButtons("packBtns", v => { selectedPack = Number(v); calculateTotal(); });
-setupButtons("noteBtns", v => {
-  selectedNote = v;
-  $("noteInput").style.display = v === "其他" ? "block" : "none";
-  if (v !== "其他") $("noteInput").value = "";
+setupButtons('locationBtns', value => { selectedLocation = value; });
+setupButtons('packBtns', value => { selectedPack = Number(value); calculateTotal(); });
+setupButtons('noteBtns', value => {
+  selectedNote = value;
+  $('noteInput').style.display = value === '其他' ? 'block' : 'none';
+  if (value !== '其他') $('noteInput').value = '';
 });
-function getNumber(id) { const v = $(id).value.trim(); return v === "" ? 0 : Number(v); }
+function getNumber(id) {
+  const value = $(id).value.trim();
+  return value === '' ? 0 : Number(value);
+}
 function calculateTotal() {
-  const total = getNumber("boxQty") * selectedPack + getNumber("looseQty");
-  $("totalQty").textContent = Number.isFinite(total) ? total.toLocaleString() : "0";
+  const total = getNumber('boxQty') * selectedPack + getNumber('looseQty');
+  $('totalQty').textContent = Number.isFinite(total) ? total.toLocaleString() : '0';
   return total;
 }
-$("boxQty").addEventListener("input",calculateTotal);
-$("looseQty").addEventListener("input",calculateTotal);
+$('boxQty').addEventListener('input', calculateTotal);
+$('looseQty').addEventListener('input', calculateTotal);
 
 function addRecord() {
-  const item = $("item").value.trim(), model = $("model").value;
-  const boxes = $("boxQty").value.trim(), loose = $("looseQty").value.trim();
+  const item = $('item').value.trim();
+  const model = $('model').value;
+  const boxes = $('boxQty').value.trim();
+  const loose = $('looseQty').value.trim();
   const total = calculateTotal();
-  const note = selectedNote === "其他" ? $("noteInput").value.trim() : selectedNote;
-  if (!item) return alert("請先掃描或輸入料號");
-  if (!selectedLocation) return alert("請選擇儲位");
-  if (!selectedPack) return alert("請選擇每箱入數");
-  if (boxes === "" && loose === "") return alert("請輸入箱數或散裝數量");
-  if ((boxes !== "" && (!Number.isInteger(Number(boxes)) || Number(boxes)<0)) ||
-      (loose !== "" && (!Number.isInteger(Number(loose)) || Number(loose)<0))) return alert("箱數及散裝數量必須為非負整數");
-  if (!Number.isFinite(total) || total <= 0) return alert("總數必須大於 0");
-  if (!selectedNote) return alert("請選擇備註；如無備註可選「其他」並輸入「無」");
-  if (selectedNote === "其他" && !note) return alert("請輸入其他備註原因");
+  const note = selectedNote === '其他' ? $('noteInput').value.trim() : selectedNote;
+  if (!item) return alert('請先掃描或輸入料號');
+  if (!selectedLocation) return alert('請選擇儲位');
+  if (!selectedPack) return alert('請選擇每箱入數');
+  if (boxes === '' && loose === '') return alert('請輸入箱數或散裝數量');
+  if ((boxes !== '' && (!Number.isInteger(Number(boxes)) || Number(boxes) < 0)) || (loose !== '' && (!Number.isInteger(Number(loose)) || Number(loose) < 0))) return alert('箱數及散裝數量必須為非負整數');
+  if (!Number.isFinite(total) || total <= 0) return alert('總數必須大於 0');
+  if (!selectedNote) return alert('請選擇備註；如無備註可選「其他」並輸入「無」');
+  if (selectedNote === '其他' && !note) return alert('請輸入其他備註原因');
   records.unshift({
-    time:new Date().toLocaleString("zh-TW",{hour12:false}), item, model,
-    location:selectedLocation, pack:selectedPack, boxes:boxes||0, loose:loose||0, total, note
+    time:new Date().toLocaleString('zh-TW', { hour12:false }), item, model,
+    location:selectedLocation, pack:selectedPack, boxes:boxes || 0, loose:loose || 0, total, note
   });
-  saveRecords(); resetForm(); alert("儲存成功！");
+  saveRecords();
+  resetForm();
+  alert('儲存成功！');
 }
-$("saveBtn").addEventListener("click",addRecord);
+$('saveBtn').addEventListener('click', addRecord);
 function resetForm() {
-  ["item","model","boxQty","looseQty","noteInput"].forEach(id => $(id).value = "");
-  $("noteInput").style.display = "none"; $("totalQty").textContent = "0";
-  selectedLocation=""; selectedPack=0; selectedNote="";
-  document.querySelectorAll(".optionBtn").forEach(b=>b.classList.remove("selected"));
+  ['item','model','boxQty','looseQty','noteInput'].forEach(id => $(id).value = '');
+  $('noteInput').style.display = 'none';
+  $('totalQty').textContent = '0';
+  selectedLocation = '';
+  selectedPack = 0;
+  selectedNote = '';
+  document.querySelectorAll('.optionBtn').forEach(btn => btn.classList.remove('selected'));
 }
 function renderRecords() {
-  const tbody = $("recordTable").querySelector("tbody"); tbody.innerHTML = "";
-  records.forEach((r,index) => {
+  const tbody = $('recordTable').querySelector('tbody');
+  tbody.innerHTML = '';
+  records.forEach((record, index) => {
     const row = tbody.insertRow();
-    [r.time,r.item,r.model,r.location,r.pack,r.boxes,r.loose,r.total,r.note].forEach(v => row.insertCell().textContent = v ?? "");
-    const cell = row.insertCell(), btn = document.createElement("span");
-    btn.textContent="刪除"; btn.className="deleteBtn";
-    btn.onclick=()=>{if(confirm("確定刪除此筆紀錄？")){records.splice(index,1);saveRecords();}};
+    [record.time,record.item,record.model,record.location,record.pack,record.boxes,record.loose,record.total,record.note].forEach(value => {
+      row.insertCell().textContent = value ?? '';
+    });
+    const cell = row.insertCell();
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = '刪除';
+    btn.className = 'deleteBtn';
+    btn.style.background = 'transparent';
+    btn.style.minHeight = 'auto';
+    btn.style.padding = '4px';
+    btn.addEventListener('click', () => {
+      if (confirm('確定刪除此筆紀錄？')) { records.splice(index, 1); saveRecords(); }
+    });
     cell.appendChild(btn);
   });
 }
-function updateMasterTable() {
-  const tbody = $("masterTable").querySelector("tbody");
-  tbody.innerHTML = "";
-  const entries = Object.entries(itemModelMap).sort((a,b)=>a[0].localeCompare(b[0]));
-  $("masterCount").textContent = entries.length;
-  entries.forEach(([code,name])=>{
-    const row = tbody.insertRow();
-    row.insertCell().textContent = code;
-    row.insertCell().textContent = name;
-  });
+
+// 料件主檔：預設只顯示筆數，點擊按鈕才載入清單視窗。
+function updateMasterCount() {
+  const count = Object.keys(DEFAULT_ITEM_MODEL_MAP).length;
+  $('masterCount').textContent = count;
+  $('modalMasterCount').textContent = '共 ' + count + ' 筆資料';
 }
-function localDate(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
-$("exportBtn").addEventListener("click",()=>{
-  if(!records.length)return alert("目前沒有資料可以匯出");
-  const rows=[["時間","料號","型號／品名","儲位","每箱入數","箱數","散裝","總數","備註"],
-    ...records.map(r=>[r.time,r.item,r.model,r.location,r.pack,r.boxes,r.loose,r.total,r.note])];
-  downloadCsv("庫存紀錄_"+localDate()+".csv",rows);
+function renderMasterList() {
+  const keyword = $('masterSearch').value.trim().toLocaleLowerCase();
+  const tbody = $('masterList');
+  tbody.innerHTML = '';
+  const entries = Object.entries(DEFAULT_ITEM_MODEL_MAP)
+    .sort((a,b) => a[0].localeCompare(b[0]))
+    .filter(([code, model]) => code.toLocaleLowerCase().includes(keyword) || model.toLocaleLowerCase().includes(keyword));
+  if (!entries.length) {
+    const row = tbody.insertRow();
+    const cell = row.insertCell();
+    cell.colSpan = 2;
+    cell.className = 'empty-row';
+    cell.textContent = '沒有找到符合的料件資料';
+  } else {
+    entries.forEach(([code, model]) => {
+      const row = tbody.insertRow();
+      row.insertCell().textContent = code;
+      row.insertCell().textContent = model;
+    });
+  }
+  $('masterResultCount').textContent = keyword ? '搜尋結果：' + entries.length + ' / ' + Object.keys(DEFAULT_ITEM_MODEL_MAP).length + ' 筆' : '顯示全部 ' + entries.length + ' 筆';
+}
+function openMasterWindow() {
+  $('masterSearch').value = '';
+  renderMasterList();
+  updateMasterCount();
+  $('masterModal').classList.add('show');
+  $('masterSearch').focus();
+}
+function closeMasterWindow() { $('masterModal').classList.remove('show'); }
+$('openMasterBtn').addEventListener('click', openMasterWindow);
+$('closeMasterBtn').addEventListener('click', closeMasterWindow);
+$('closeMasterFooter').addEventListener('click', closeMasterWindow);
+$('masterSearch').addEventListener('input', renderMasterList);
+$('masterModal').addEventListener('click', event => { if (event.target === $('masterModal')) closeMasterWindow(); });
+document.addEventListener('keydown', event => { if (event.key === 'Escape') closeMasterWindow(); });
+
+function localDate() {
+  const date = new Date();
+  return date.getFullYear() + '-' + String(date.getMonth()+1).padStart(2,'0') + '-' + String(date.getDate()).padStart(2,'0');
+}
+function downloadCsv(filename, rows) {
+  const csv = '\uFEFF' + rows.map(row => row.map(value => '"' + String(value ?? '').replace(/"/g, '""') + '"').join(',')).join('\r\n');
+  const blob = new Blob([csv], { type:'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+$('exportBtn').addEventListener('click', () => {
+  if (!records.length) return alert('目前沒有資料可以匯出');
+  const rows = [['時間','料號','型號／品名','儲位','每箱入數','箱數','散裝','總數','備註'], ...records.map(r => [r.time,r.item,r.model,r.location,r.pack,r.boxes,r.loose,r.total,r.note])];
+  downloadCsv('庫存紀錄_' + localDate() + '.csv', rows);
 });
 
-// 初始化：料件資料每次都直接讀取程式碼中的清單；庫存紀錄則保存在本機瀏覽器
-itemModelMap = { ...DEFAULT_ITEM_MODEL_MAP };
+// 初始化：料件主檔永遠以程式碼中的 DEFAULT_ITEM_MODEL_MAP 為準；舊庫存紀錄保留。
 records = safeLoad(RECORD_KEY, []);
-updateMasterTable(); renderRecords(); updateModel();
-// 不在網頁載入時自動開相機，避免瀏覽器阻擋；請由使用者按「啟動相機」
-
+if (!Array.isArray(records)) records = [];
+updateMasterCount();
+renderRecords();
+updateModel();
 </script>
 </body>
 </html>
